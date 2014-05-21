@@ -2197,7 +2197,13 @@ CalHeatMap.prototype = {
 
 		var stop = range;
 		if (typeof range !== "object") {
-			stop = new Date(endDate.setDate(endDate.getDate() + range * 7));
+			// we're adding a single microsecond to the "stop" date here
+			// there was a problem with the year/week combo for 2012. 12/31/2012 was not picked out as a valid week
+			// since d3.time.mondays/sundays does not appear to be inclusive with the end date (and if the week happens
+			// to bump up against the next near, such as in 2012, it will be left out)
+			// if the dataset happened to include data from 12/31/2012 it would throw an Exception and not render that
+			// domain properly
+			stop = new Date((endDate.setDate(endDate.getDate() + range * 7) + 1);
 		}
 
 		return (this.options.weekStartOnMonday === true) ?
